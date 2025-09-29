@@ -5,9 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Interactive Terminal</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
   <div class="terminal">
+        <py-config>
+      {
+        "files": ["main.py"]
+      }
+    </py-config>
+
+    <py-script src="main.py"></py-script>
     <div id="output"></div>
     <div class="input-line">
       <span class="prompt">user@site:~$</span>
