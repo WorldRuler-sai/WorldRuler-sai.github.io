@@ -4,7 +4,7 @@ from hangman_art import stages,logo,word_list
 print(logo)
 # TODO-1: - Update the word list to use the 'word_list' from hangman_words.py
 
-lives = 10
+lives = 13
 
 # TODO-3: - Import the logo from hangman_art.py and print it at the start of the game.
 
