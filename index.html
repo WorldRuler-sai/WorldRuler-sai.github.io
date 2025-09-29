@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Final Project</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Terminal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="terminal">
-    <p>Click <button class="run-btn">Run</button> to run the final project you will build.</p>
+    <div id="output"></div>
+    <div class="input-line">
+      <span class="prompt">user@site:~$</span>
+      <input type="text" id="commandInput" autofocus />
+    </div>
   </div>
+  <script src="script.js"></script>
 </body>
 </html>
