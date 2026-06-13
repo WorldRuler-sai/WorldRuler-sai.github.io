@@ -3,48 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP8266 Buzzer Remote</title>
+    <title>GitHub Realtime Dashboard</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            background-color: #f4f4f9;
+            background-color: #121214;
+            color: #ffffff;
             padding-top: 100px;
         }
-        .buzz-btn {
-            background-color: #ff4757;
-            color: white;
-            border: none;
-            padding: 20px 40px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: 0.2s;
+        .panel {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #1a1a1e;
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid #2d2d34;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
-        .buzz-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        .status-light {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 20px 50px;
+            font-size: 36px;
+            font-weight: bold;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+        .on {
+            background-color: #00ff87;
+            color: #000000;
+            box-shadow: 0 0 30px rgba(0, 255, 135, 0.5);
+        }
+        .off {
+            background-color: #ff3838;
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(255, 56, 56, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <h1>NodeMCU Hardware Interface</h1>
-    <!-- Clickable action item elements trigger the target sound function -->
-    <button class="buzz-btn" onclick="triggerBuzzer()">🔊 SOUND BUZZER</button>
+    <div class="panel">
+        <h2>GitHub Live IoT Node</h2>
+        <p>Real-Time Status Monitor via Firebase</p>
+        <div id="display" class="status-light off">LOADING...</div>
+    </div>
 
     <script>
-        function triggerBuzzer() {
-            // REPLACE THIS IP with your exact serial monitor IP address
-            const espIP = "192.168.1.8"; 
-            
-            // Delivers a stealthy background signal without redirecting the page
-            fetch(espIP, { mode: 'cors' })
-            .then(response => console.log("Success! Code sent."))
-            .catch(error => console.error("Error contacting board:", error));
+        // Points directly to your specific database data node stream
+        const firebaseURL = "https://firebasedatabase.app";
+
+        function checkCloudStatus() {
+            fetch(firebaseURL)
+            .then(res => res.json())
+            .then(data => {
+                const element = document.getElementById("display");
+                if (data === "ON") {
+                    element.innerText = "DIGITAL: ON";
+                    element.className = "status-light on";
+                } else {
+                    element.innerText = "DIGITAL: OFF";
+                    element.className = "status-light off";
+                }
+            })
+            .catch(err => console.error("Cloud linking sync error:", err));
         }
+
+        // Continually cross-references database variables every 300ms for active tracking
+        setInterval(checkCloudStatus, 300);
     </script>
 
 </body>
