@@ -1,78 +1,1333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Realtime Dashboard</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            background-color: #121214;
-            color: #ffffff;
-            padding-top: 100px;
-        }
-        .panel {
-            max-width: 400px;
-            margin: 0 auto;
-            background-color: #1a1a1e;
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid #2d2d34;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .status-light {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 20px 50px;
-            font-size: 36px;
-            font-weight: bold;
-            border-radius: 100px;
-            transition: all 0.3s ease;
-        }
-        .on {
-            background-color: #00ff87;
-            color: #000000;
-            box-shadow: 0 0 30px rgba(0, 255, 135, 0.5);
-        }
-        .off {
-            background-color: #ff3838;
-            color: #ffffff;
-            box-shadow: 0 0 30px rgba(255, 56, 56, 0.5);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warz Fitness — Marathahalli, Bengaluru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161513;
+    --iron:#232120;
+    --iron-2:#2c2a28;
+    --concrete:#eeeae1;
+    --concrete-dim:#c9c3b6;
+    --chalk:#f6f3ec;
+    --orange:#ff4d1f;
+    --orange-dim:#c93d18;
+    --steel:#5c6670;
+    --yellow:#f2c230;
+    --line: rgba(238,234,225,0.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--chalk);
+    font-family:'Work Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Anton', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+    margin:0;
+  }
+  .mono{font-family:'Space Mono', monospace;}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  ::selection{background:var(--orange);color:var(--ink);}
+
+  @media (prefers-reduced-motion: no-preference){
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+    .reveal.in{opacity:1;transform:translateY(0);}
+  }
+
+  /* ---- NAV ---- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    background:rgba(22,21,19,0.88);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Anton';font-size:22px;letter-spacing:0.02em;}
+  .logo .z{color:var(--orange);}
+  .navlinks{display:flex;gap:34px;font-size:14px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
+  .navlinks a{text-decoration:none;color:var(--concrete-dim);position:relative;padding-bottom:4px;transition:color .2s;}
+  .navlinks a:hover, .navlinks a:focus-visible{color:var(--chalk);}
+  .navlinks a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--orange);transition:width .25s;}
+  .navlinks a:hover::after{width:100%;}
+  .nav-cta{
+    background:var(--orange);color:var(--ink);font-weight:800;
+    padding:10px 20px;text-decoration:none;font-size:13px;
+    letter-spacing:0.06em;text-transform:uppercase;
+    border:1px solid var(--orange);
+    transition:background .2s, color .2s;
+  }
+  .nav-cta:hover{background:transparent;color:var(--orange);}
+  .navtoggle{display:none;background:none;border:none;color:var(--chalk);font-size:26px;cursor:pointer;}
+
+  /* ---- HERO ---- */
+  .hero{
+    position:relative;
+    padding:170px 0 110px;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse 900px 500px at 85% -10%, rgba(255,77,31,0.16), transparent 60%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 64px),
+      var(--ink);
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:'Space Mono';font-size:13px;color:var(--orange);
+    letter-spacing:0.18em;text-transform:uppercase;
+    display:flex;align-items:center;gap:12px;margin-bottom:22px;
+  }
+  .eyebrow::before{content:"";width:34px;height:2px;background:var(--orange);display:inline-block;}
+  .hero h1{
+    font-size:clamp(52px, 9vw, 118px);
+    line-height:0.92;
+    color:var(--chalk);
+  }
+  .hero h1 .stroke{
+    -webkit-text-stroke:2px var(--chalk);
+    color:transparent;
+  }
+  .hero-sub{
+    max-width:520px;margin-top:26px;
+    font-size:17px;line-height:1.65;color:var(--concrete-dim);
+  }
+  .hero-actions{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--orange);color:var(--ink);font-weight:800;
+    padding:16px 30px;text-decoration:none;font-size:14px;
+    letter-spacing:0.06em;text-transform:uppercase;
+    border:1px solid var(--orange);transition:all .2s;
+  }
+  .btn-primary:hover{background:transparent;color:var(--orange);}
+  .btn-ghost{
+    border:1px solid var(--line);color:var(--chalk);
+    padding:16px 30px;text-decoration:none;font-size:14px;
+    letter-spacing:0.06em;text-transform:uppercase;font-weight:700;
+    transition:border-color .2s, background .2s;
+  }
+  .btn-ghost:hover{border-color:var(--chalk);background:rgba(238,234,225,0.05);}
+
+  .statbar{
+    margin-top:76px;
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--line);
+  }
+  .statbar div{padding:24px 0 0;border-right:1px solid var(--line);}
+  .statbar div:last-child{border-right:none;}
+  .statnum{font-family:'Anton';font-size:34px;color:var(--chalk);}
+  .statnum span{color:var(--orange);}
+  .statlabel{font-family:'Space Mono';font-size:11.5px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;margin-top:6px;}
+
+  /* ---- SECTION SHELL ---- */
+  section{padding:100px 0;}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:56px;flex-wrap:wrap;}
+  .kicker{font-family:'Space Mono';font-size:12.5px;color:var(--orange);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:14px;}
+  .section-head h2{font-size:clamp(34px,4.5vw,54px);color:var(--chalk);max-width:640px;line-height:1.02;}
+  .section-note{max-width:320px;color:var(--concrete-dim);font-size:14.5px;line-height:1.6;}
+
+  .services{background:var(--iron);border-bottom:1px solid var(--line);}
+  .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  .service-card{background:var(--iron);padding:38px 30px 34px;transition:background .25s;}
+  .service-card:hover{background:var(--iron-2);}
+  .service-num{font-family:'Space Mono';color:var(--steel);font-size:13px;margin-bottom:22px;}
+  .service-card h3{font-size:26px;color:var(--chalk);margin-bottom:14px;letter-spacing:0.01em;}
+  .service-card ul{list-style:none;margin:20px 0 0;padding:0;font-size:14px;color:var(--concrete-dim);line-height:1.5;}
+  .service-card li{padding:9px 0;border-top:1px solid var(--line);}
+  .service-card li:first-child{border-top:none;}
+  .service-card li b{color:var(--chalk);font-weight:600;}
+
+  /* ---- FEES / PLATES ---- */
+  .fees{background:var(--ink);}
+  .plate-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:14px;}
+  .plate{
+    border:1px solid var(--line);
+    padding:26px 18px 22px;
+    text-align:center;
+    position:relative;
+    transition:border-color .25s, transform .25s;
+  }
+  .plate:hover{border-color:var(--orange);transform:translateY(-4px);}
+  .plate.best{border-color:var(--orange);background:rgba(255,77,31,0.06);}
+  .plate-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--orange);color:var(--ink);font-family:'Space Mono';font-size:10px;letter-spacing:0.08em;padding:3px 10px;text-transform:uppercase;font-weight:700;white-space:nowrap;}
+  .plate-term{font-family:'Space Mono';font-size:12px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;}
+  .plate-was{font-family:'Space Mono';font-size:13px;color:var(--steel);text-decoration:line-through;margin-top:14px;}
+  .plate-now{font-family:'Anton';font-size:32px;color:var(--chalk);margin-top:4px;}
+  .plate-now sup{font-size:15px;color:var(--orange);vertical-align:2px;margin-right:2px;}
+
+  .pt-block{margin-top:64px;padding-top:56px;border-top:1px solid var(--line);}
+  .pt-head{display:flex;align-items:baseline;gap:16px;margin-bottom:30px;flex-wrap:wrap;}
+  .pt-head h3{font-size:26px;color:var(--chalk);}
+  .pt-head span{font-family:'Space Mono';font-size:13px;color:var(--concrete-dim);}
+  .pt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .pt-card{border:1px solid var(--line);padding:22px 20px;}
+  .pt-sessions{font-family:'Space Mono';font-size:12px;color:var(--orange);letter-spacing:0.06em;text-transform:uppercase;}
+  .pt-price{font-family:'Anton';font-size:24px;color:var(--chalk);margin-top:10px;}
+
+  /* ---- WHY / GALLERY STRIP ---- */
+  .why{background:var(--iron);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .why-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:70px;align-items:center;}
+  .why-copy p{color:var(--concrete-dim);font-size:16px;line-height:1.75;margin:0 0 20px;}
+  .why-list{display:flex;flex-direction:column;gap:0;margin-top:30px;}
+  .why-item{display:flex;gap:16px;padding:16px 0;border-top:1px solid var(--line);}
+  .why-item:first-child{border-top:none;}
+  .why-item .dot{width:8px;height:8px;background:var(--orange);margin-top:7px;flex:none;}
+  .why-item div b{display:block;color:var(--chalk);font-size:15px;margin-bottom:3px;}
+  .why-item div span{color:var(--concrete-dim);font-size:14px;}
+  .why-visual{border:1px solid var(--line);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;background:var(--iron-2);position:relative;overflow:hidden;}
+  .why-visual svg{width:64%;}
+
+  /* ---- TESTIMONIAL / RATING ---- */
+  .rating-strip{background:var(--orange);color:var(--ink);padding:46px 0;}
+  .rating-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+  .rating-big{font-family:'Anton';font-size:48px;display:flex;align-items:baseline;gap:10px;}
+  .rating-big span{font-family:'Space Mono';font-size:15px;font-weight:700;}
+  .stars{letter-spacing:3px;font-size:18px;}
+  .rating-quote{max-width:480px;font-size:15px;font-weight:600;line-height:1.5;}
+
+  /* ---- LOCATION / CONTACT ---- */
+  .contact{background:var(--ink);}
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .contact-panel{background:var(--ink);padding:46px 42px;}
+  .contact-row{display:flex;gap:18px;padding:18px 0;border-top:1px solid var(--line);}
+  .contact-row:first-child{border-top:none;}
+  .contact-row .k{font-family:'Space Mono';font-size:11px;color:var(--steel);letter-spacing:0.1em;text-transform:uppercase;width:90px;flex:none;padding-top:2px;}
+  .contact-row .v{font-size:15.5px;color:var(--chalk);line-height:1.55;}
+  .contact-row .v a{color:var(--orange);text-decoration:none;font-weight:600;}
+  .contact-row .v a:hover{text-decoration:underline;}
+  .map-panel{background:var(--iron-2);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:46px 42px;position:relative;}
+  .map-panel::before{
+    content:"";position:absolute;inset:0;opacity:0.5;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:28px 28px;
+  }
+  .map-panel > *{position:relative;}
+  .map-pin{width:40px;height:40px;border:2px solid var(--orange);border-radius:50% 50% 50% 0;transform:rotate(-45deg);margin-bottom:26px;}
+  .map-panel h3{font-size:22px;color:var(--chalk);margin-bottom:10px;}
+  .map-panel p{color:var(--concrete-dim);font-size:14.5px;line-height:1.6;max-width:280px;margin:0 0 22px;}
+
+  /* ---- TRACKER ---- */
+  .tracker{background:var(--iron);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .tracker-grid{display:grid;grid-template-columns:0.85fr 1.15fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .tracker-panel{background:var(--iron);padding:42px 38px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-family:'Space Mono';font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--steel);margin-bottom:8px;}
+  .field input, .field select{
+    width:100%;background:var(--ink);border:1px solid var(--line);color:var(--chalk);
+    padding:12px 14px;font-family:'Work Sans';font-size:14.5px;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--orange);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .btn-block{
+    width:100%;background:var(--orange);color:var(--ink);font-weight:800;border:1px solid var(--orange);
+    padding:14px 20px;font-size:13.5px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:all .2s;
+  }
+  .btn-block:hover{background:transparent;color:var(--orange);}
+  .bmi-readout{display:flex;align-items:baseline;gap:14px;margin:26px 0 10px;}
+  .bmi-num{font-family:'Anton';font-size:56px;color:var(--chalk);}
+  .bmi-cat{font-family:'Space Mono';font-size:13px;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;}
+  .bmi-gauge{height:8px;background:var(--iron-2);border:1px solid var(--line);position:relative;margin:14px 0 20px;}
+  .bmi-gauge-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--steel),var(--orange));transition:width .4s ease;width:0%;}
+  .bmi-rec{font-size:14px;color:var(--concrete-dim);line-height:1.6;padding:16px 18px;border:1px solid var(--line);background:var(--iron-2);}
+  .bmi-rec b{color:var(--chalk);}
+
+  .session-panel{background:var(--iron-2);padding:42px 38px;}
+  .session-table{width:100%;border-collapse:collapse;margin-top:18px;}
+  .session-table th{font-family:'Space Mono';font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--steel);text-align:left;padding:0 10px 10px 0;border-bottom:1px solid var(--line);}
+  .session-table td{font-size:13.5px;padding:10px 10px 10px 0;border-bottom:1px solid var(--line);color:var(--chalk);}
+  .session-table tr:last-child td{border-bottom:none;}
+  .session-empty{color:var(--steel);font-size:13.5px;font-style:italic;padding:18px 0;}
+  .session-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+  .session-total b{font-family:'Anton';font-size:26px;color:var(--orange);}
+  .session-actions{display:flex;gap:12px;margin-top:6px;}
+  .btn-small{border:1px solid var(--line);color:var(--concrete-dim);background:none;padding:9px 16px;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;transition:border-color .2s,color .2s;}
+  .btn-small:hover{border-color:var(--chalk);color:var(--chalk);}
+  .tracker-note{font-family:'Space Mono';font-size:11.5px;color:var(--steel);margin-top:16px;line-height:1.6;}
+
+  .more-tools{margin-top:64px;}
+  .tool-tabs{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:1px;}
+  .tool-tabbtn{
+    flex:1;background:var(--iron);border:none;color:var(--concrete-dim);
+    font-family:'Space Mono';font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;
+    padding:16px 12px;cursor:pointer;transition:background .2s, color .2s;
+  }
+  .tool-tabbtn:hover{color:var(--chalk);}
+  .tool-tabbtn.active{background:var(--orange);color:var(--ink);font-weight:700;}
+  .tool-panels{border:1px solid var(--line);border-top:none;background:var(--iron-2);}
+  .tool-panel{display:none;padding:36px 38px;grid-template-columns:1fr 1fr;gap:40px;}
+  .tool-panel.active{display:grid;}
+  .tool-result{display:flex;flex-direction:column;justify-content:center;}
+  .tool-result-num{font-family:'Anton';font-size:44px;color:var(--chalk);line-height:1;}
+  .tool-result-num span{font-size:16px;color:var(--orange);font-family:'Space Mono';margin-left:6px;}
+  .tool-result-label{font-family:'Space Mono';font-size:11px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;margin-top:10px;}
+  .tool-result-list{margin-top:22px;display:flex;flex-direction:column;gap:0;}
+  .tool-result-row{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);font-size:13.5px;}
+  .tool-result-row:first-child{border-top:none;}
+  .tool-result-row span:first-child{color:var(--concrete-dim);}
+  .tool-result-row span:last-child{color:var(--chalk);font-weight:600;}
+  @media (max-width: 880px){
+    .tool-panel{grid-template-columns:1fr;}
+    .tool-tabs{flex-direction:column;}
+  }
+
+  /* ---- JOIN ---- */
+  .join{background:var(--ink);}
+  .join-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .join-form{background:var(--ink);padding:44px 40px;}
+  .join-side{background:var(--iron-2);padding:44px 40px;display:flex;flex-direction:column;justify-content:center;}
+  .join-side h3{font-size:24px;color:var(--chalk);margin-bottom:16px;}
+  .join-side p{color:var(--concrete-dim);font-size:14.5px;line-height:1.65;margin:0 0 24px;}
+  .join-side .trial-btn{margin-bottom:14px;}
+  .radio-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .radio-pill{display:inline-flex;align-items:center;border:1px solid var(--line);padding:9px 16px;font-size:13px;cursor:pointer;color:var(--concrete-dim);transition:all .2s;}
+  .radio-pill input{display:none;}
+  .radio-pill.active{border-color:var(--orange);color:var(--chalk);background:rgba(255,77,31,0.08);}
+
+  /* ---- Visual polish: grain + glow ---- */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode:overlay;
+  }
+  .plate:hover, .service-card:hover, .pt-card:hover{box-shadow:0 0 0 1px var(--orange), 0 18px 34px -18px rgba(255,77,31,0.5);}
+  .pt-card{transition:all .25s;}
+  .btn-primary, .btn-block{position:relative;overflow:hidden;}
+
+  /* ---- GALLERY / ZONES ---- */
+  .gallery{background:var(--iron);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  .gallery-item{background:var(--iron);padding:36px 24px;text-align:center;transition:background .25s, transform .25s;}
+  .gallery-item:hover{background:var(--iron-2);transform:translateY(-4px);}
+  .gallery-item svg{width:44px;height:44px;margin:0 auto 18px;display:block;}
+  .gallery-item h4{font-size:15px;color:var(--chalk);letter-spacing:0.02em;text-transform:uppercase;font-family:'Space Mono';margin-bottom:8px;}
+  .gallery-item p{font-size:13px;color:var(--concrete-dim);line-height:1.5;margin:0;}
+
+  /* ---- BOOKING TYPE PILLS / SLOTS ---- */
+  .booking-type-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+  .confirm-card{border:1px solid var(--orange);background:rgba(255,77,31,0.08);padding:26px 24px;margin-top:20px;}
+  .confirm-card .ref{font-family:'Anton';font-size:26px;color:var(--chalk);}
+  .confirm-card p{font-size:13.5px;color:var(--concrete-dim);margin:8px 0 0;line-height:1.55;}
+
+  /* ---- TRAINER LOGIN MODAL ---- */
+  .nav-trainer{
+    background:none;border:1px solid var(--line);color:var(--concrete-dim);
+    font-family:'Space Mono';font-size:12px;letter-spacing:0.05em;text-transform:uppercase;
+    padding:9px 16px;cursor:pointer;margin-right:14px;transition:all .2s;
+  }
+  .nav-trainer:hover{border-color:var(--chalk);color:var(--chalk);}
+  .modal-overlay{
+    display:none;position:fixed;inset:0;z-index:100;background:rgba(15,14,13,0.82);
+    align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:var(--iron);border:1px solid var(--line);max-width:380px;width:100%;
+    padding:40px 34px;position:relative;
+  }
+  .modal-close{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--steel);font-size:20px;cursor:pointer;}
+  .modal-close:hover{color:var(--chalk);}
+  .modal-card h3{font-size:22px;color:var(--chalk);margin-bottom:6px;}
+  .modal-card .kicker{margin-bottom:16px;}
+  .modal-error{color:var(--orange);font-size:12.5px;font-family:'Space Mono';margin-top:10px;display:none;}
+  .modal-hint{font-family:'Space Mono';font-size:11px;color:var(--steel);margin-top:18px;line-height:1.6;border-top:1px solid var(--line);padding-top:16px;}
+
+  /* ---- TRAINER DASHBOARD ---- */
+  .dashboard{display:none;background:var(--ink);border-top:1px solid var(--line);}
+  .dashboard.open{display:block;}
+  .dash-top{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;margin-bottom:36px;}
+  .dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:40px;}
+  .dash-stat{background:var(--iron);padding:24px 22px;}
+  .dash-stat-num{font-family:'Anton';font-size:34px;color:var(--chalk);}
+  .dash-stat-num span{color:var(--orange);}
+  .dash-stat-label{font-family:'Space Mono';font-size:10.5px;color:var(--steel);letter-spacing:0.08em;text-transform:uppercase;margin-top:6px;}
+  .dash-controls{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .dash-controls input, .dash-controls select{
+    background:var(--iron);border:1px solid var(--line);color:var(--chalk);
+    padding:10px 14px;font-size:13.5px;font-family:'Work Sans';
+  }
+  .dash-table-wrap{border:1px solid var(--line);overflow-x:auto;}
+  .dash-table{width:100%;border-collapse:collapse;min-width:760px;}
+  .dash-table th{font-family:'Space Mono';font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--steel);text-align:left;padding:14px 16px;background:var(--iron-2);border-bottom:1px solid var(--line);}
+  .dash-table td{font-size:13.5px;padding:14px 16px;border-bottom:1px solid var(--line);color:var(--chalk);}
+  .dash-table tr:last-child td{border-bottom:none;}
+  .dash-empty{padding:60px 20px;text-align:center;color:var(--steel);font-size:14px;}
+  .status-pill{
+    font-family:'Space Mono';font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;
+    padding:5px 10px;border:1px solid var(--line);cursor:pointer;background:none;color:var(--concrete-dim);
+  }
+  .status-pill.confirmed{border-color:var(--orange);color:var(--orange);}
+  .dash-logout{border:1px solid var(--line);color:var(--concrete-dim);background:none;padding:10px 18px;font-family:'Space Mono';font-size:12px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;}
+  .dash-logout:hover{border-color:var(--chalk);color:var(--chalk);}
+
+  /* ---- CTA BAND ---- */
+  .cta-band{padding:110px 0;text-align:center;background:var(--iron);border-top:1px solid var(--line);}
+  .cta-band h2{font-size:clamp(38px,6vw,72px);color:var(--chalk);line-height:1;}
+  .cta-band h2 .stroke{-webkit-text-stroke:2px var(--orange);color:transparent;}
+  .cta-band p{color:var(--concrete-dim);margin:22px auto 40px;max-width:440px;font-size:15.5px;}
+
+  footer{background:var(--ink);border-top:1px solid var(--line);padding:36px 0;}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+  .foot-inner .logo{font-size:17px;}
+  .foot-links{display:flex;gap:26px;font-size:13px;color:var(--steel);}
+  .foot-links a{text-decoration:none;color:var(--steel);}
+  .foot-links a:hover{color:var(--chalk);}
+  .foot-note{font-family:'Space Mono';font-size:11.5px;color:var(--steel);}
+
+  @media (max-width: 880px){
+    .navlinks, .nav-cta{display:none;}
+    .navtoggle{display:block;}
+    .statbar{grid-template-columns:repeat(2,1fr);}
+    .statbar div:nth-child(2){border-right:none;}
+    .statbar div{border-bottom:1px solid var(--line);padding-bottom:20px;}
+    .service-grid{grid-template-columns:1fr;}
+    .plate-row{grid-template-columns:repeat(2,1fr);}
+    .pt-grid{grid-template-columns:repeat(2,1fr);}
+    .why-grid{grid-template-columns:1fr;gap:40px;}
+    .contact-grid{grid-template-columns:1fr;}
+    .section-head{flex-direction:column;align-items:flex-start;}
+    .tracker-grid{grid-template-columns:1fr;}
+    .join-grid{grid-template-columns:1fr;}
+    .field-row{grid-template-columns:1fr;}
+    .gallery-grid{grid-template-columns:repeat(2,1fr);}
+    .dash-stats{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width: 520px){
+    .plate-row{grid-template-columns:1fr 1fr;}
+    .statbar{grid-template-columns:1fr 1fr;}
+  }
+</style>
 </head>
 <body>
 
-    <div class="panel">
-        <h2>GitHub Live IoT Node</h2>
-        <p>Real-Time Status Monitor via Firebase</p>
-        <div id="display" class="status-light off">LOADING...</div>
+<header>
+  <nav class="navbar">
+    <div class="logo">WAR<span class="z">Z</span>&nbsp;FITNESS</div>
+    <div class="navlinks">
+      <a href="#services">Services</a>
+      <a href="#fees">Fees</a>
+      <a href="#why">Why Us</a>
+      <a href="#gallery">Facility</a>
+      <a href="#tracker">Tracker</a>
+      <a href="#join">Join</a>
+      <a href="#contact">Location</a>
+    </div>
+    <a class="nav-cta" href="#join">Join Now</a>
+    <button class="nav-trainer" onclick="openLogin()">Trainer Login</button>
+    <button class="navtoggle" aria-label="menu">☰</button>
+  </nav>
+</header>
+
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeLogin()" aria-label="close">✕</button>
+    <div class="kicker">Staff access</div>
+    <h3>Trainer Login</h3>
+    <div class="field" style="margin-top:20px;">
+      <label for="login-id">Trainer ID</label>
+      <input id="login-id" type="text" placeholder="trainer">
+    </div>
+    <div class="field">
+      <label for="login-pass">Password</label>
+      <input id="login-pass" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn-block" onclick="attemptLogin()">Log in</button>
+    <div class="modal-error" id="login-error">Incorrect ID or password. Try again.</div>
+    <div class="modal-hint">Demo credentials — ID <b style="color:var(--chalk);">trainer</b>, password <b style="color:var(--chalk);">warz2026</b>. This is a front-end demo: bookings shown are only the ones submitted in this browser tab.</div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Marathahalli · Bengaluru</div>
+    <h1 class="reveal in">BUILD THE<br><span class="stroke">BODY</span> YOU<br>DEMAND.</h1>
+    <p class="hero-sub">Premium equipment, qualified personal trainers, and coaching built around bodybuilding, weight loss, and nutrition — inside a modern floor in the heart of Marathahalli.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#fees">See Membership Fees</a>
+      <a class="btn-ghost" href="tel:+919901479828">99014 79828</a>
+    </div>
+    <div class="statbar">
+      <div>
+        <div class="statnum">4.8<span>★</span></div>
+        <div class="statlabel">132 Google reviews</div>
+      </div>
+      <div>
+        <div class="statnum">7<span>/7</span></div>
+        <div class="statlabel">5AM–11PM, Sun–Sat</div>
+      </div>
+      <div>
+        <div class="statnum">3</div>
+        <div class="statlabel">Core programs</div>
+      </div>
+      <div>
+        <div class="statnum">P</div>
+        <div class="statlabel">On-site parking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">What we run</div>
+        <h2>Three programs. One floor.<br>No guesswork.</h2>
+      </div>
+      <p class="section-note">Every member is placed on a plan built around one of these tracks — coached, tracked, and adjusted as you progress.</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="service-grid">
+      <div class="service-card reveal">
+        <div class="service-num">01 — Strength</div>
+        <h3>Bodybuilding</h3>
+        <p style="color:var(--concrete-dim);font-size:14.5px;line-height:1.6;">For members chasing strength and muscle mass, led by experienced trainers.</p>
+        <ul>
+          <li><b>Personalized plans</b> — built around your goals and current level</li>
+          <li><b>Free weights & machines</b> — full resistance range to load progressively</li>
+          <li><b>Technique coaching</b> — lifting form corrected for safety and output</li>
+          <li><b>Progress tracking</b> — regular checks to keep training honest</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">02 — Conditioning</div>
+        <h3>Weight Loss</h3>
+        <p style="color:var(--concrete-dim);font-size:14.5px;line-height:1.6;">A multi-angle approach for members here to drop weight and keep it off.</p>
+        <ul>
+          <li><b>Tailored regimens</b> — cardio, strength, and flexibility work combined</li>
+          <li><b>Structured pacing</b> — sessions sequenced to build capacity safely</li>
+          <li><b>Trainer check-ins</b> — accountability built into every week</li>
+          <li><b>Milestone reviews</b> — plans revised as your numbers move</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-num">03 — Nutrition</div>
+        <h3>Nutrition Guidance</h3>
+        <p style="color:var(--concrete-dim);font-size:14.5px;line-height:1.6;">Because the plate matters as much as the plates you lift.</p>
+        <ul>
+          <li><b>Eating habits</b> — education on portion control and food choices</li>
+          <li><b>Supplement advice</b> — recommendations to support performance</li>
+          <li><b>Ongoing support</b> — continuous guidance to stay on track</li>
+          <li><b>Balanced approach</b> — results without an all-or-nothing diet</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="fees" id="fees">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Fee structure</div>
+        <h2>Load the bar,<br>lock in the term.</h2>
+      </div>
+      <p class="section-note">Every plan is discounted off the listed rate — the longer the commitment, the more comes off.</p>
     </div>
 
-    <script>
-        // Points directly to your specific database data node stream
-        const firebaseURL = "https://firebasedatabase.app";
+    <div class="plate-row">
+      <div class="plate reveal">
+        <div class="plate-term">1 Month</div>
+        <div class="plate-was mono">₹3,000</div>
+        <div class="plate-now"><sup>₹</sup>2,500</div>
+      </div>
+      <div class="plate reveal">
+        <div class="plate-term">2 Months</div>
+        <div class="plate-was mono">₹5,000</div>
+        <div class="plate-now"><sup>₹</sup>4,000</div>
+      </div>
+      <div class="plate reveal">
+        <div class="plate-term">3 Months</div>
+        <div class="plate-was mono">₹6,000</div>
+        <div class="plate-now"><sup>₹</sup>5,000</div>
+      </div>
+      <div class="plate reveal">
+        <div class="plate-term">6 Months</div>
+        <div class="plate-was mono">₹10,000</div>
+        <div class="plate-now"><sup>₹</sup>9,000</div>
+      </div>
+      <div class="plate best reveal">
+        <div class="plate-tag">Best Value</div>
+        <div class="plate-term">1 Year</div>
+        <div class="plate-was mono">₹15,000</div>
+        <div class="plate-now"><sup>₹</sup>13,000</div>
+      </div>
+    </div>
 
-        function checkCloudStatus() {
-            fetch(firebaseURL)
-            .then(res => res.json())
-            .then(data => {
-                const element = document.getElementById("display");
-                if (data === "ON") {
-                    element.innerText = "DIGITAL: ON";
-                    element.className = "status-light on";
-                } else {
-                    element.innerText = "DIGITAL: OFF";
-                    element.className = "status-light off";
-                }
-            })
-            .catch(err => console.error("Cloud linking sync error:", err));
-        }
+    <div class="pt-block">
+      <div class="pt-head">
+        <h3>Personal Trainer</h3>
+        <span>— one-on-one coaching, sold separately or alongside membership</span>
+      </div>
+      <div class="pt-grid">
+        <div class="pt-card reveal">
+          <div class="pt-sessions">12 Sessions</div>
+          <div class="pt-price">₹7,000</div>
+        </div>
+        <div class="pt-card reveal">
+          <div class="pt-sessions">26 Sessions</div>
+          <div class="pt-price">₹12,000</div>
+        </div>
+        <div class="pt-card reveal">
+          <div class="pt-sessions">2 Months</div>
+          <div class="pt-price">₹18,000</div>
+        </div>
+        <div class="pt-card reveal">
+          <div class="pt-sessions">3 Months</div>
+          <div class="pt-price">₹30,000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        // Continually cross-references database variables every 300ms for active tracking
-        setInterval(checkCloudStatus, 300);
-    </script>
+<section class="why" id="why">
+  <div class="wrap">
+    <div class="why-grid">
+      <div class="why-copy reveal">
+        <div class="kicker">Why Warz</div>
+        <h2 style="font-size:clamp(30px,4vw,44px);color:var(--chalk);margin-bottom:22px;">A floor built for<br>the whole journey.</h2>
+        <p>Warz Fitness gives members a comprehensive range of services under one roof — whether the goal is building muscle, losing weight, or simply adopting healthier habits, the team supports every step.</p>
+        <p>Set in the bustling Marathahalli neighborhood, the gym pairs a modern, welcoming training floor with dedicated on-site parking — one less reason to skip a session.</p>
+        <div class="why-list">
+          <div class="why-item"><div class="dot"></div><div><b>Qualified trainers</b><span>Coaching on every program, not just the weight room</span></div></div>
+          <div class="why-item"><div class="dot"></div><div><b>Premium equipment</b><span>Full range of free weights and resistance machines</span></div></div>
+          <div class="why-item"><div class="dot"></div><div><b>Community-first</b><span>Members who push and motivate each other to progress</span></div></div>
+          <div class="why-item"><div class="dot"></div><div><b>Parking on site</b><span>Straightforward access in a busy part of Marathahalli</span></div></div>
+        </div>
+      </div>
+      <div class="why-visual reveal">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="92" width="180" height="16" fill="none" stroke="#eeeae1" stroke-width="3"/>
+          <rect x="22" y="70" width="14" height="60" fill="#ff4d1f"/>
+          <rect x="38" y="78" width="10" height="44" fill="#eeeae1"/>
+          <rect x="152" y="70" width="14" height="60" fill="#ff4d1f"/>
+          <rect x="140" y="78" width="10" height="44" fill="#eeeae1"/>
+          <circle cx="100" cy="100" r="3" fill="#f2c230"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="gallery" id="gallery">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">On the floor</div>
+        <h2>Four zones,<br>one membership.</h2>
+      </div>
+      <p class="section-note">Everything a member needs is on one floor — no separate passes, no extra fees to move between zones.</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="gallery-grid">
+      <div class="gallery-item reveal">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="21" width="40" height="6" fill="#eeeae1"/><rect x="8" y="14" width="6" height="20" fill="#ff4d1f"/><rect x="34" y="14" width="6" height="20" fill="#ff4d1f"/></svg>
+        <h4>Free Weights</h4>
+        <p>Full dumbbell and barbell range for progressive strength work.</p>
+      </div>
+      <div class="gallery-item reveal">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="17" stroke="#eeeae1" stroke-width="3"/><path d="M24 24 L24 12" stroke="#ff4d1f" stroke-width="3" stroke-linecap="round"/><path d="M24 24 L32 28" stroke="#eeeae1" stroke-width="3" stroke-linecap="round"/></svg>
+        <h4>Cardio Deck</h4>
+        <p>Treadmills and conditioning machines for endurance and weight-loss work.</p>
+      </div>
+      <div class="gallery-item reveal">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="28" height="28" stroke="#eeeae1" stroke-width="3"/><path d="M17 31 L31 17" stroke="#ff4d1f" stroke-width="3" stroke-linecap="round"/></svg>
+        <h4>Machines &amp; Resistance</h4>
+        <p>Guided resistance machines for safe, technique-first training.</p>
+      </div>
+      <div class="gallery-item reveal">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 8 C30 16 34 22 34 28 C34 34.6 29.5 39 24 39 C18.5 39 14 34.6 14 28 C14 22 18 16 24 8Z" stroke="#eeeae1" stroke-width="3"/><circle cx="24" cy="29" r="4" fill="#ff4d1f"/></svg>
+        <h4>Recovery Corner</h4>
+        <p>Stretching space and guidance to close out every session right.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tracker" id="tracker">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Tools</div>
+        <h2>Check your numbers,<br>log the session.</h2>
+      </div>
+      <p class="section-note">Program-fit, calorie needs, strength benchmarks, and hydration — quick tools you can run right on this page, plus a live set tracker for the gym floor.</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="tracker-grid">
+
+      <div class="tracker-panel reveal">
+        <div class="kicker" style="margin-bottom:6px;">Program-fit check</div>
+        <h3 style="font-size:20px;color:var(--chalk);margin-bottom:22px;">BMI Calculator</h3>
+        <div class="field-row">
+          <div class="field">
+            <label for="bmi-height">Height (cm)</label>
+            <input id="bmi-height" type="number" inputmode="decimal" placeholder="170">
+          </div>
+          <div class="field">
+            <label for="bmi-weight">Weight (kg)</label>
+            <input id="bmi-weight" type="number" inputmode="decimal" placeholder="70">
+          </div>
+        </div>
+        <button class="btn-block" onclick="calcBMI()">Calculate</button>
+
+        <div id="bmi-result" style="display:none;">
+          <div class="bmi-readout">
+            <div class="bmi-num" id="bmi-num">—</div>
+            <div class="bmi-cat" id="bmi-cat">—</div>
+          </div>
+          <div class="bmi-gauge"><div class="bmi-gauge-fill" id="bmi-fill"></div></div>
+          <div class="bmi-rec" id="bmi-rec"></div>
+        </div>
+      </div>
+
+      <div class="session-panel reveal">
+        <div class="kicker" style="margin-bottom:6px;">Today's workout</div>
+        <h3 style="font-size:20px;color:var(--chalk);margin-bottom:22px;">Session Tracker</h3>
+        <div class="field-row" style="grid-template-columns:1.4fr 0.7fr 0.7fr 0.9fr;">
+          <div class="field" style="margin-bottom:0;">
+            <label for="ex-name">Exercise</label>
+            <input id="ex-name" type="text" placeholder="Bench Press">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label for="ex-sets">Sets</label>
+            <input id="ex-sets" type="number" placeholder="4">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label for="ex-reps">Reps</label>
+            <input id="ex-reps" type="number" placeholder="10">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label for="ex-weight">Kg</label>
+            <input id="ex-weight" type="number" placeholder="40">
+          </div>
+        </div>
+        <button class="btn-block" style="margin-top:16px;" onclick="addSet()">Add to session</button>
+
+        <table class="session-table" id="session-table">
+          <thead>
+            <tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Kg</th><th>Volume</th></tr>
+          </thead>
+          <tbody id="session-body"></tbody>
+        </table>
+        <div id="session-empty" class="session-empty">No sets logged yet — add your first exercise above.</div>
+
+        <div class="session-total" id="session-total" style="display:none;">
+          <span class="mono" style="color:var(--concrete-dim);font-size:12px;text-transform:uppercase;letter-spacing:0.06em;">Total volume</span>
+          <b id="session-total-num">0 kg</b>
+        </div>
+        <div class="session-actions">
+          <button class="btn-small" onclick="clearSession()">Clear session</button>
+          <button class="btn-small" onclick="shareSession()">Send to trainer</button>
+        </div>
+        <div class="tracker-note">Logged sets stay on this page only and clear on refresh — ask at the front desk about syncing a full member tracker to your phone.</div>
+      </div>
+
+    </div>
+
+    <div class="more-tools reveal">
+      <div class="kicker" style="margin-bottom:6px;">More tools</div>
+      <h3 style="font-size:20px;color:var(--chalk);margin-bottom:22px;">Calorie, Strength &amp; Hydration</h3>
+
+      <div class="tool-tabs">
+        <button class="tool-tabbtn active" onclick="switchTool('cal')" id="tab-cal">Calorie Needs</button>
+        <button class="tool-tabbtn" onclick="switchTool('orm')" id="tab-orm">One-Rep Max</button>
+        <button class="tool-tabbtn" onclick="switchTool('water')" id="tab-water">Water Intake</button>
+      </div>
+
+      <div class="tool-panels">
+        <!-- Calorie / TDEE -->
+        <div class="tool-panel active" id="panel-cal">
+          <div>
+            <div class="field-row">
+              <div class="field">
+                <label for="cal-age">Age</label>
+                <input id="cal-age" type="number" placeholder="28">
+              </div>
+              <div class="field">
+                <label for="cal-gender">Gender</label>
+                <select id="cal-gender">
+                  <option value="m">Male</option>
+                  <option value="f">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="cal-height">Height (cm)</label>
+                <input id="cal-height" type="number" placeholder="170">
+              </div>
+              <div class="field">
+                <label for="cal-weight">Weight (kg)</label>
+                <input id="cal-weight" type="number" placeholder="70">
+              </div>
+            </div>
+            <div class="field">
+              <label for="cal-activity">Activity level</label>
+              <select id="cal-activity">
+                <option value="1.2">Sedentary — desk job, little exercise</option>
+                <option value="1.375">Light — trains 1–3 days/week</option>
+                <option value="1.55" selected>Moderate — trains 3–5 days/week</option>
+                <option value="1.725">Heavy — trains 6–7 days/week</option>
+              </select>
+            </div>
+            <button class="btn-block" onclick="calcTDEE()">Calculate</button>
+          </div>
+          <div class="tool-result">
+            <div class="tool-result-num" id="tdee-num">—<span>kcal / day</span></div>
+            <div class="tool-result-label">Maintenance calories</div>
+            <div class="tool-result-list" id="tdee-list"></div>
+          </div>
+        </div>
+
+        <!-- One Rep Max -->
+        <div class="tool-panel" id="panel-orm">
+          <div>
+            <div class="field-row">
+              <div class="field">
+                <label for="orm-weight">Weight lifted (kg)</label>
+                <input id="orm-weight" type="number" placeholder="60">
+              </div>
+              <div class="field">
+                <label for="orm-reps">Reps completed</label>
+                <input id="orm-reps" type="number" placeholder="8">
+              </div>
+            </div>
+            <button class="btn-block" onclick="calc1RM()">Calculate</button>
+          </div>
+          <div class="tool-result">
+            <div class="tool-result-num" id="orm-num">—<span>kg</span></div>
+            <div class="tool-result-label">Estimated one-rep max</div>
+            <div class="tool-result-list" id="orm-list"></div>
+          </div>
+        </div>
+
+        <!-- Water intake -->
+        <div class="tool-panel" id="panel-water">
+          <div>
+            <div class="field-row">
+              <div class="field">
+                <label for="water-weight">Weight (kg)</label>
+                <input id="water-weight" type="number" placeholder="70">
+              </div>
+              <div class="field">
+                <label for="water-activity">Session length today</label>
+                <select id="water-activity">
+                  <option value="0">Rest day</option>
+                  <option value="30">Under 45 min</option>
+                  <option value="45" selected>45–75 min</option>
+                  <option value="70">75 min+</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-block" onclick="calcWater()">Calculate</button>
+          </div>
+          <div class="tool-result">
+            <div class="tool-result-num" id="water-num">—<span>litres</span></div>
+            <div class="tool-result-label">Suggested daily intake</div>
+            <div class="tool-result-list" id="water-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="rating-strip">
+  <div class="wrap rating-inner">
+    <div class="rating-big">4.8 <span>/ 5 — 132 GOOGLE REVIEWS</span></div>
+    <div class="stars">★★★★★</div>
+    <div class="rating-quote">Consistently rated among the top-reviewed gyms in Marathahalli by members training bodybuilding, weight-loss, and nutrition-led programs.</div>
+  </div>
+</div>
+
+<section class="join" id="join">
+  <div class="wrap" style="padding:0;">
+    <div class="join-grid">
+      <div class="join-form reveal">
+        <div class="kicker">Client booking portal</div>
+        <h2 style="font-size:clamp(28px,3.5vw,38px);color:var(--chalk);margin-bottom:24px;">Join Warz<br>Fitness.</h2>
+
+        <div id="join-form-fields">
+          <div class="field">
+            <label>Booking type</label>
+            <div class="radio-row booking-type-row" id="j-type">
+              <label class="radio-pill active"><input type="radio" name="btype" value="Free Trial" checked>Free Trial</label>
+              <label class="radio-pill"><input type="radio" name="btype" value="Membership">Membership</label>
+              <label class="radio-pill"><input type="radio" name="btype" value="Personal Trainer">Personal Trainer</label>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="j-name">Full name</label>
+              <input id="j-name" type="text" placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="j-phone">Phone number</label>
+              <input id="j-phone" type="tel" placeholder="9XXXXXXXXX">
+            </div>
+          </div>
+          <div class="field">
+            <label>Interested in</label>
+            <div class="radio-row" id="j-program">
+              <label class="radio-pill active"><input type="radio" name="program" value="Bodybuilding" checked>Bodybuilding</label>
+              <label class="radio-pill"><input type="radio" name="program" value="Weight Loss">Weight Loss</label>
+              <label class="radio-pill"><input type="radio" name="program" value="Nutrition Guidance">Nutrition</label>
+              <label class="radio-pill"><input type="radio" name="program" value="Not sure yet">Not sure yet</label>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="j-date">Preferred date</label>
+              <input id="j-date" type="date">
+            </div>
+            <div class="field">
+              <label for="j-slot">Preferred slot</label>
+              <select id="j-slot">
+                <option>Morning (5–9 AM)</option>
+                <option>Midday (9 AM–4 PM)</option>
+                <option selected>Evening (4–8 PM)</option>
+                <option>Night (8–11 PM)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="j-plan">Preferred plan</label>
+            <select id="j-plan">
+              <option>1 Month — ₹2,500</option>
+              <option>2 Months — ₹4,000</option>
+              <option>3 Months — ₹5,000</option>
+              <option>6 Months — ₹9,000</option>
+              <option selected>1 Year — ₹13,000</option>
+              <option>Personal Trainer package</option>
+            </select>
+          </div>
+          <button class="btn-block" onclick="submitJoin()">Confirm Booking</button>
+          <div class="tracker-note">Adds you to the Warz Fitness booking list and opens WhatsApp with your details so the team can confirm your slot.</div>
+        </div>
+
+        <div class="confirm-card" id="join-confirm" style="display:none;">
+          <div class="kicker" style="margin-bottom:8px;">Booking received</div>
+          <div class="ref" id="confirm-ref">WZ-0000</div>
+          <p id="confirm-detail"></p>
+          <p>Save this reference — quote it at the front desk or when the team calls to confirm.</p>
+          <button class="btn-small" style="margin-top:16px;" onclick="resetJoinForm()">Make another booking</button>
+        </div>
+      </div>
+
+      <div class="join-side reveal">
+        <div class="kicker">Not ready to commit?</div>
+        <h3>Book a free trial first.</h3>
+        <p>Walk the floor, meet a trainer, and try a session before choosing a plan — book online or call directly.</p>
+        <a class="btn-primary trial-btn" style="display:inline-block;" href="https://backstage.yoactiv.com/boktrial.aspx?adminid=Bs801CRPpySBfKnNWEQZdQ==" target="_blank" rel="noopener">Book a Free Trial Online</a>
+        <a class="btn-ghost" style="display:inline-block;" href="tel:+919901479828">Or Call 99014 79828</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dashboard" id="dashboard">
+  <div class="wrap" style="padding-top:70px;padding-bottom:80px;">
+    <div class="dash-top">
+      <div>
+        <div class="kicker">Trainer only</div>
+        <h2 style="font-size:clamp(28px,3.5vw,40px);color:var(--chalk);">All bookings.</h2>
+      </div>
+      <button class="dash-logout" onclick="logoutTrainer()">Log out</button>
+    </div>
+
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="dash-total">0</div>
+        <div class="dash-stat-label">Total bookings</div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="dash-trials">0</div>
+        <div class="dash-stat-label">Free trials</div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="dash-members">0</div>
+        <div class="dash-stat-label">Membership enquiries</div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="dash-pending">0</div>
+        <div class="dash-stat-label">Awaiting confirmation</div>
+      </div>
+    </div>
+
+    <div class="dash-controls">
+      <input id="dash-search" type="text" placeholder="Search name or phone…" oninput="renderDashboard()" style="min-width:220px;">
+      <select id="dash-filter" onchange="renderDashboard()">
+        <option value="">All types</option>
+        <option value="Free Trial">Free Trial</option>
+        <option value="Membership">Membership</option>
+        <option value="Personal Trainer">Personal Trainer</option>
+      </select>
+    </div>
+
+    <div class="dash-table-wrap">
+      <table class="dash-table" id="dash-table">
+        <thead>
+          <tr><th>Ref</th><th>Name</th><th>Phone</th><th>Type</th><th>Program</th><th>Date / Slot</th><th>Status</th></tr>
+        </thead>
+        <tbody id="dash-body"></tbody>
+      </table>
+      <div class="dash-empty" id="dash-empty">No bookings yet — they'll appear here the moment a client books above.</div>
+    </div>
+  </div>
+</section>
+
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Find us</div>
+        <h2>Marathahalli,<br>4th floor.</h2>
+      </div>
+    </div>
+  </div>
+  <div class="wrap" style="padding:0;">
+    <div class="contact-grid">
+      <div class="contact-panel reveal">
+        <div class="contact-row">
+          <div class="k">Address</div>
+          <div class="v">4th floor, Krishna Grand, above BOB Bank,<br>Aswath Nagar, Marathahalli,<br>Bengaluru, Karnataka 560037</div>
+        </div>
+        <div class="contact-row">
+          <div class="k">Phone</div>
+          <div class="v"><a href="tel:+919901479828">99014 79828</a></div>
+        </div>
+        <div class="contact-row">
+          <div class="k">Hours</div>
+          <div class="v">Sunday – Saturday<br>5:00 AM – 11:00 PM</div>
+        </div>
+        <div class="contact-row">
+          <div class="k">Web</div>
+          <div class="v"><a href="https://warzfitness.in" target="_blank" rel="noopener">warzfitness.in</a></div>
+        </div>
+      </div>
+      <div class="map-panel reveal">
+        <div class="map-pin"></div>
+        <h3>Get directions</h3>
+        <p>Above BOB Bank on Aswath Nagar Road — a short walk from central Marathahalli.</p>
+        <a class="btn-primary" href="https://www.google.com/maps/search/?api=1&query=Warz+Fitness+Aswath+Nagar+Marathahalli+Bengaluru+560037" target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="wrap">
+    <h2>READY TO <span class="stroke">TRAIN?</span></h2>
+    <p>First session, plan questions, or just want to see the floor — call ahead and the team will sort the rest.</p>
+    <div class="hero-actions" style="justify-content:center;">
+      <a class="btn-primary" href="tel:+919901479828">Call 99014 79828</a>
+      <a class="btn-ghost" href="#fees">View Plans</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div class="logo">WAR<span class="z">Z</span>&nbsp;FITNESS</div>
+    <div class="foot-links">
+      <a href="#services">Services</a>
+      <a href="#fees">Fees</a>
+      <a href="#contact">Location</a>
+    </div>
+    <div class="foot-note">MARATHAHALLI · BENGALURU 560037</div>
+  </div>
+</footer>
+
+<script>
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.15});
+  els.forEach(el=>io.observe(el));
+
+  // ---- More tools: tabs ----
+  function switchTool(name){
+    document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tool-tabbtn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('panel-'+name).classList.add('active');
+    document.getElementById('tab-'+name).classList.add('active');
+  }
+
+  // ---- Calorie / TDEE (Mifflin-St Jeor) ----
+  function calcTDEE(){
+    const age = parseFloat(document.getElementById('cal-age').value);
+    const gender = document.getElementById('cal-gender').value;
+    const h = parseFloat(document.getElementById('cal-height').value);
+    const w = parseFloat(document.getElementById('cal-weight').value);
+    const activity = parseFloat(document.getElementById('cal-activity').value);
+    if(!age || !h || !w){ return; }
+    let bmr = gender === 'm'
+      ? (10*w + 6.25*h - 5*age + 5)
+      : (10*w + 6.25*h - 5*age - 161);
+    const tdee = Math.round(bmr * activity);
+    document.getElementById('tdee-num').innerHTML = tdee.toLocaleString() + '<span>kcal / day</span>';
+    document.getElementById('tdee-list').innerHTML = `
+      <div class="tool-result-row"><span>Weight loss (Weight Loss program)</span><span>${Math.round(tdee-500).toLocaleString()} kcal</span></div>
+      <div class="tool-result-row"><span>Maintenance</span><span>${tdee.toLocaleString()} kcal</span></div>
+      <div class="tool-result-row"><span>Lean gain (Bodybuilding program)</span><span>${Math.round(tdee+300).toLocaleString()} kcal</span></div>
+    `;
+  }
+
+  // ---- One-rep max (Epley) ----
+  function calc1RM(){
+    const w = parseFloat(document.getElementById('orm-weight').value);
+    const r = parseFloat(document.getElementById('orm-reps').value);
+    if(!w || !r){ return; }
+    const orm = Math.round(w * (1 + r/30));
+    document.getElementById('orm-num').innerHTML = orm + '<span>kg</span>';
+    document.getElementById('orm-list').innerHTML = `
+      <div class="tool-result-row"><span>80% — strength sets</span><span>${Math.round(orm*0.8)} kg</span></div>
+      <div class="tool-result-row"><span>70% — hypertrophy sets</span><span>${Math.round(orm*0.7)} kg</span></div>
+      <div class="tool-result-row"><span>60% — technique / warm-up</span><span>${Math.round(orm*0.6)} kg</span></div>
+    `;
+  }
+
+  // ---- Water intake ----
+  function calcWater(){
+    const w = parseFloat(document.getElementById('water-weight').value);
+    const extra = parseFloat(document.getElementById('water-activity').value);
+    if(!w){ return; }
+    const litres = Math.round(((w * 35) + (extra*20)) ) / 1000;
+    document.getElementById('water-num').innerHTML = litres.toFixed(1) + '<span>litres</span>';
+    document.getElementById('water-list').innerHTML = `
+      <div class="tool-result-row"><span>Base need (35ml/kg)</span><span>${(w*35/1000).toFixed(1)} L</span></div>
+      <div class="tool-result-row"><span>Training top-up</span><span>${(extra*20/1000).toFixed(1)} L</span></div>
+      <div class="tool-result-row"><span>~ Glasses (250ml)</span><span>${Math.round(litres*1000/250)}</span></div>
+    `;
+  }
+
+  // ---- BMI calculator ----
+  function calcBMI(){
+    const h = parseFloat(document.getElementById('bmi-height').value);
+    const w = parseFloat(document.getElementById('bmi-weight').value);
+    if(!h || !w){ return; }
+    const bmi = w / Math.pow(h/100, 2);
+    const bmiR = Math.round(bmi*10)/10;
+    let cat, rec, pct;
+    if(bmi < 18.5){ cat='Underweight'; pct=15; rec='<b>Bodybuilding</b> is the priority here — structured strength training with progressive loading to build muscle mass, paired with our <b>Nutrition Guidance</b> to get calorie and protein intake right.'; }
+    else if(bmi < 25){ cat='Normal'; pct=45; rec='Solid base. Most members here run <b>Bodybuilding</b> for strength and shape, or general conditioning — either way, a Personal Trainer package will sharpen technique fast.'; }
+    else if(bmi < 30){ cat='Overweight'; pct=70; rec='<b>Weight Loss</b> is the recommended starting track — tailored cardio, strength, and flexibility work, backed by <b>Nutrition Guidance</b> for sustainable results.'; }
+    else{ cat='Obese'; pct=92; rec='Start with the <b>Weight Loss</b> program and a Personal Trainer for closely supervised sessions, alongside <b>Nutrition Guidance</b> to rebuild eating habits safely.'; }
+    document.getElementById('bmi-num').textContent = bmiR;
+    document.getElementById('bmi-cat').textContent = cat;
+    document.getElementById('bmi-fill').style.width = pct + '%';
+    document.getElementById('bmi-rec').innerHTML = rec;
+    document.getElementById('bmi-result').style.display = 'block';
+  }
+
+  // ---- Session tracker ----
+  let sessionLog = [];
+  function addSet(){
+    const name = document.getElementById('ex-name').value.trim();
+    const sets = parseFloat(document.getElementById('ex-sets').value);
+    const reps = parseFloat(document.getElementById('ex-reps').value);
+    const kg = parseFloat(document.getElementById('ex-weight').value);
+    if(!name || !sets || !reps || !kg){ return; }
+    sessionLog.push({name, sets, reps, kg, volume: sets*reps*kg});
+    document.getElementById('ex-name').value='';
+    document.getElementById('ex-sets').value='';
+    document.getElementById('ex-reps').value='';
+    document.getElementById('ex-weight').value='';
+    renderSession();
+  }
+  function renderSession(){
+    const body = document.getElementById('session-body');
+    const empty = document.getElementById('session-empty');
+    const totalRow = document.getElementById('session-total');
+    body.innerHTML = '';
+    if(sessionLog.length === 0){
+      empty.style.display = 'block';
+      totalRow.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    totalRow.style.display = 'flex';
+    let total = 0;
+    sessionLog.forEach(row=>{
+      total += row.volume;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${row.name}</td><td>${row.sets}</td><td>${row.reps}</td><td>${row.kg}</td><td>${row.volume.toLocaleString()} kg</td>`;
+      body.appendChild(tr);
+    });
+    document.getElementById('session-total-num').textContent = total.toLocaleString() + ' kg';
+  }
+  function clearSession(){
+    sessionLog = [];
+    renderSession();
+  }
+  function shareSession(){
+    if(sessionLog.length === 0){ return; }
+    let text = "Today's session at Warz Fitness:%0A";
+    sessionLog.forEach(r=>{ text += `- ${r.name}: ${r.sets}x${r.reps} @ ${r.kg}kg%0A`; });
+    window.open(`https://wa.me/919901479828?text=${text}`, '_blank');
+  }
+
+  // ---- Join form radio pills (booking type + program) ----
+  document.querySelectorAll('#j-type .radio-pill, #j-program .radio-pill').forEach(pill=>{
+    pill.addEventListener('click', ()=>{
+      const group = pill.closest('.radio-row');
+      group.querySelectorAll('.radio-pill').forEach(p=>p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+
+  // ---- Booking store (in-memory, this browser tab only) ----
+  let bookings = [];
+  let bookingSeq = 1;
+
+  function submitJoin(){
+    const name = document.getElementById('j-name').value.trim();
+    const phone = document.getElementById('j-phone').value.trim();
+    const btype = document.querySelector('#j-type input:checked').value;
+    const program = document.querySelector('#j-program input:checked').value;
+    const plan = document.getElementById('j-plan').value;
+    const date = document.getElementById('j-date').value;
+    const slot = document.getElementById('j-slot').value;
+    if(!name || !phone){ alert('Add your name and phone number so the team can reach you.'); return; }
+
+    const ref = 'WZ-' + String(1000 + bookingSeq).slice(-4);
+    bookingSeq++;
+    const dateLabel = date ? new Date(date).toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) : 'Flexible';
+
+    bookings.push({
+      ref, name, phone, type: btype, program, plan,
+      dateLabel, slot, status:'Pending',
+      created: new Date()
+    });
+
+    // Confirmation UI
+    document.getElementById('confirm-ref').textContent = ref;
+    document.getElementById('confirm-detail').textContent =
+      `${btype} · ${program} · ${dateLabel}, ${slot}`;
+    document.getElementById('join-form-fields').style.display = 'none';
+    document.getElementById('join-confirm').style.display = 'block';
+
+    // WhatsApp handoff
+    const text = `Hi Warz Fitness, new booking ${ref}.%0AType: ${encodeURIComponent(btype)}%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AProgram: ${encodeURIComponent(program)}%0APlan: ${encodeURIComponent(plan)}%0ADate: ${encodeURIComponent(dateLabel)} (${encodeURIComponent(slot)})`;
+    window.open(`https://wa.me/919901479828?text=${text}`, '_blank');
+
+    renderDashboard();
+  }
+
+  function resetJoinForm(){
+    document.getElementById('join-form-fields').style.display = 'block';
+    document.getElementById('join-confirm').style.display = 'none';
+    document.getElementById('j-name').value = '';
+    document.getElementById('j-phone').value = '';
+    document.getElementById('j-date').value = '';
+  }
+
+  // ---- Trainer login ----
+  const TRAINER_ID = 'trainer';
+  const TRAINER_PASS = 'warz2026';
+
+  function openLogin(){ document.getElementById('login-modal').classList.add('open'); }
+  function closeLogin(){
+    document.getElementById('login-modal').classList.remove('open');
+    document.getElementById('login-error').style.display = 'none';
+  }
+  function attemptLogin(){
+    const id = document.getElementById('login-id').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    if(id === TRAINER_ID && pass === TRAINER_PASS){
+      closeLogin();
+      document.getElementById('login-id').value = '';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('dashboard').classList.add('open');
+      renderDashboard();
+      document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  }
+  function logoutTrainer(){
+    document.getElementById('dashboard').classList.remove('open');
+    document.getElementById('join').scrollIntoView({behavior:'smooth'});
+  }
+  function toggleStatus(ref){
+    const b = bookings.find(x=>x.ref === ref);
+    if(!b) return;
+    b.status = b.status === 'Pending' ? 'Confirmed' : 'Pending';
+    renderDashboard();
+  }
+
+  function renderDashboard(){
+    const search = (document.getElementById('dash-search')?.value || '').toLowerCase();
+    const filter = document.getElementById('dash-filter')?.value || '';
+    const body = document.getElementById('dash-body');
+    const empty = document.getElementById('dash-empty');
+    if(!body) return;
+
+    const filtered = bookings.filter(b=>{
+      const matchesSearch = !search || b.name.toLowerCase().includes(search) || b.phone.includes(search);
+      const matchesType = !filter || b.type === filter;
+      return matchesSearch && matchesType;
+    });
+
+    body.innerHTML = '';
+    if(filtered.length === 0){
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      filtered.slice().reverse().forEach(b=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="mono">${b.ref}</td>
+          <td>${b.name}</td>
+          <td>${b.phone}</td>
+          <td>${b.type}</td>
+          <td>${b.program}</td>
+          <td>${b.dateLabel} · ${b.slot}</td>
+          <td><button class="status-pill ${b.status==='Confirmed'?'confirmed':''}" onclick="toggleStatus('${b.ref}')">${b.status}</button></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    document.getElementById('dash-total').textContent = bookings.length;
+    document.getElementById('dash-trials').textContent = bookings.filter(b=>b.type==='Free Trial').length;
+    document.getElementById('dash-members').textContent = bookings.filter(b=>b.type==='Membership').length;
+    document.getElementById('dash-pending').textContent = bookings.filter(b=>b.status==='Pending').length;
+  }
+
+  document.getElementById('login-modal').addEventListener('click', (e)=>{
+    if(e.target.id === 'login-modal'){ closeLogin(); }
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){ closeLogin(); }
+  });
+
+  const toggle = document.querySelector('.navtoggle');
+  const links = document.querySelector('.navlinks');
+  if(toggle){
+    toggle.addEventListener('click', ()=>{
+      const open = links.style.display === 'flex';
+      links.style.display = open ? 'none' : 'flex';
+      links.style.cssText += open ? '' : 'position:fixed;top:64px;left:0;right:0;background:#161513;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(238,234,225,0.14);gap:20px;';
+    });
+  }
+</script>
 
 </body>
 </html>
